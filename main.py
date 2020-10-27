@@ -5,11 +5,13 @@ import csv
 from datetime import datetime as DateTime
 from datetime import date
 
+
 def writeToCSV(daily_liste):
     aktuellesDatum = date.today()
     with open('Liste_' + str(aktuellesDatum) + '.csv', 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerows(daily_liste)
+
 
 def strtoArray(symbol_String):
     csv_array = []
@@ -24,7 +26,14 @@ def strtoArray(symbol_String):
 
 
 def auslesen(filter_true, driver_pfad, fitler_mrd):
-    driver = webdriver.Safari(executable_path=driver_pfad)
+    if (driver_pfad == "Firefox"):
+        driver = webdriver.Firefox()
+    elif (driver_pfad == "/usr/bin/safaridriver"):
+        driver = webdriver.Safari(executable_path=driver_pfad)
+    else:
+        driver = None
+        print("Fehler - Driver")
+        exit()
     driver.maximize_window()
     driver.get("https://www.nasdaq.com/market-activity/earnings")
     content = driver.find_elements_by_class_name("market-calendar-table__row")
@@ -68,21 +77,16 @@ def start_scraper(driver_pfad, filter_mrd):
     writeToCSV(auslesen(filter_true, driver_pfad, filter_mrd))
 
 
-
 # Die folgende Funktion soll ausgeführt werden, wenn
 # der Benutzer den Button Klick me anklickt
 def button_action():
     entry_text = eingabefeld.get()
     entry_text2 = eingabefeld_filter.get()
     if (entry_text == ""):
-        welcome_label.config(text="Gib einen Pfad ein")
+        welcome_label.config(text="Gib einen Pfad ein oder gib Firefox ein")
     else:
         ausgabe_text = "Pfad eingegeben " + entry_text + " - Filter in Mrd: " + entry_text2
-        if( "/usr/bin/safaridriver" == entry_text):
-            print("passt")
-        else:
-            print(ausgabe_text)
-        start_scraper(entry_text,entry_text2)
+        start_scraper(entry_text, entry_text2)
         welcome_label.config(text=ausgabe_text)
         fenster.quit()
 
